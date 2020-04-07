@@ -1,0 +1,5 @@
+#!/bin/bash
+
+docker run -it --rm --privileged \
+    -v "$(pwd)":/build \
+    docker.pkg.github.com/solo-io/packer-builder-arm-image/packer-builder-arm "$@"

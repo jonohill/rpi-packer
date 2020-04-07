@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+# Bit hacky. Assume .json is template arg.
+args=""
+for arg in "$@"; do
+    if [[ "$arg" == *.json ]]; then
+        template_file="$arg"
+    else
+        args="$args \"$arg\""
+    fi
+done
+
+tmp_dir="$(mktemp -d)"
+trap "rm -rf "$tmp_dir"" EXIT
+
+script_dir="$(dirname "$(realpath "$0")")"
+base_template="$script_dir/build.json"
+template_tmp="$tmp_dir/tmp.json"
+template="$tmp_dir/build.json"
+jq -s '.[0] * .[1]' "$base_template" "$template_file" >"$template_tmp"
+
+# Inject defined variables as environment variables,
+# i.e. some_var --> SOME_VAR={{user `some_var`}}
+<"$template_tmp" jq '(.provisioners[] | select(.type=="shell") | .environment_vars) = (.variables | keys | map("\(. | ascii_upcase)={{user `\(.)`}}"))' >"$template"
+
+"$script_dir/packer" $args "$template"

@@ -1,0 +1,43 @@
+{
+    "variables": {
+        "base_image": "",
+        "script_dir": ""
+    },
+    "builders": [
+        {
+            "type": "arm-image",
+            "image_type": "raspberrypi",
+            "iso_url": "{{user `base_image`}}",
+            "iso_checksum_type": "file",
+            "iso_checksum_url": "{{user `base_image`}}.sha256"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell-local",
+            "inline": [
+                "mkdir tmp-{{user `script_dir`}} || true",
+                "cd {{user `script_dir`}}",
+                "for x in ./*; do cp \"$(readlink \"$x\" || echo \"$x\")\" \"../tmp-{{user `script_dir`}}/$(basename \"$x\")\"; done"
+            ]
+        },
+        {
+            "type": "file",
+            "source": "tmp-{{user `script_dir`}}",
+            "destination": "/tmp/"
+        },
+        {
+            "type": "shell",
+            "inline": [
+                "find /tmp/tmp-{{user `script_dir`}} -type f -executable | sort | xargs -n1 bash",
+                "rm -rf /tmp/tmp-{{user `script_dir`}}"
+            ]
+        }        
+    ],
+    "post-processors": [ 
+        {
+            "type": "compress",
+            "output": "final.img.gz"
+        }
+    ]
+}
