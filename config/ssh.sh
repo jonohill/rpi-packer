@@ -4,6 +4,8 @@
 # SSH_KEY: public key for `pi` user
 # SSH_CA_KEY: SSH CA private key, base64. Signs host key, not saved.
 
+echo Start ssh
+
 set -e
 
 systemctl enable ssh
@@ -32,3 +34,5 @@ HostCertificate /etc/ssh/ssh_host_key-cert.pub
 EOF
 
 fi 
+
+echo End ssh
