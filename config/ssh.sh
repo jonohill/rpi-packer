@@ -14,6 +14,8 @@ echo "${SSH_KEY}" >> /home/pi/.ssh/authorized_keys
 
 
 if ! [[ -z "${SSH_CA_KEY}" ]]; then
+    systemctl disable regenerate_ssh_host_keys.service
+
     tmp_dir="$(mktemp -d)"
     trap "rm -rf "$tmp_dir"" EXIT
     ca_key_file="${tmp_dir}/ca_key"
@@ -31,6 +33,9 @@ if ! [[ -z "${SSH_CA_KEY}" ]]; then
 
 HostKey /etc/ssh/ssh_host_key
 HostCertificate /etc/ssh/ssh_host_key-cert.pub
+
+PasswordAuthentication no
+
 EOF
 
 fi 
