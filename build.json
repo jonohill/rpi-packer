@@ -2,7 +2,8 @@
     "variables": {
         "base_image": "",
         "script_dir": "",
-        "image_name": "build"
+        "image_name": "build",
+        "image_size": "2147483648"
     },
     "builders": [
         {
@@ -10,7 +11,8 @@
             "image_type": "raspberrypi",
             "iso_url": "{{user `base_image`}}",
             "iso_checksum_type": "file",
-            "iso_checksum_url": "{{user `base_image`}}.sha256"
+            "iso_checksum_url": "{{user `base_image`}}.sha256",
+            "target_image_size": "{{user `image_size`}}"
         }
     ],
     "provisioners": [
